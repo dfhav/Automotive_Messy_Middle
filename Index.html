@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Automotive Messy Middle Calculator</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        .card {
+            @apply bg-white p-6 rounded-xl shadow-sm border border-gray-100;
+        }
+
+        input[type="number"],
+        select {
+            @apply border border-gray-300 rounded px-3 py-2 w-full focus:ring-2 focus:ring-blue-500 outline-none bg-white;
+        }
+
+        input[type="range"] {
+            @apply w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+
+        <!-- HEADER -->
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">
+                AMM - Automotive Messy Middle
+            </h1>
+
+            <p class="text-gray-600">
+                Automotive lead estimation by touchpoint
+            </p>
+        </header>
+
+        <!-- KPI -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+
+            <div class="card col-span-1 flex flex-col justify-center">
+
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    Target Sociodemografico
+                </label>
+
+                <input
+                    type="number"
+                    id="totalTarget"
+                    value="23000000"
+                    class="text-xl font-bold text-blue-600"
+                    oninput="calculate()"
+                >
+
+                <p class="text-xs text-gray-400 mt-2">
+                    Inserire l'entità del target
+                </p>
+            </div>
+
+            <div class="card col-span-3 grid grid-cols-3 gap-4 bg-slate-900 text-white shadow-lg items-center text-center">
+
+                <div>
+                    <span class="block text-[10px] uppercase tracking-wider opacity-60 mb-1">
+                        Lead Totali Lorde
+                    </span>
+
+                    <span id="grossLeads" class="text-2xl font-bold text-gray-400 line-through">
+                        0
+                    </span>
+                </div>
+
+                <div class="border-l border-slate-800">
+                    <span class="block text-xs uppercase tracking-wider text-blue-400 font-bold mb-1">
+                        Lead Uniche Nette
+                    </span>
+
+                    <span id="totalLeads" class="text-4xl font-black text-blue-400">
+                        0
+                    </span>
+                </div>
+
+                <div class="border-l border-slate-800">
+                    <span class="block text-xs uppercase tracking-wider text-emerald-400 font-bold mb-1">
+                        Blended CVR
+                    </span>
+
+                    <span id="blendedCVR" class="text-4xl font-black text-emerald-400">
+                        0%
+                    </span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- PARAMETRI -->
+        <div class="card mb-8">
+
+            <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4">
+                    </path>
+                </svg>
+
+                Parametri Strategici
+            </h2>
+
+            <!-- PRIMA RIGA -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+
+                <!-- Tipo Lancio -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-2">
+                        Tipo di Lancio
+                    </label>
+
+                    <select id="launchType" onchange="calculate()">
+                        <option value="standard">Modello Esistente</option>
+                        <option value="restyling">Restyling (Facelift)</option>
+                        <option value="new" selected>Nuovo Modello</option>
+                    </select>
+                </div>
+
+                <!-- Familiarità Brand -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-2">
+                        Familiarità Brand
+                    </label>
+
+                    <select id="brandStatus" onchange="calculate()">
+                        <option value="top">
+                            Brand Leader / Consolidato
+                        </option>
+
+                        <option value="existing" selected>
+                            Brand Esistente
+                        </option>
+
+                        <option value="new_brand">
+                            Nuovo Player / Challenger
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Competitor -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-2">
+                        Aggressività Competitor
+                    </label>
+
+                    <select id="compLevel" onchange="calculate()">
+                        <option value="2">
+                            Bassa (Pressione promo bassa)
+                        </option>
+
+                        <option value="3">
+                            Media (Pressione promo standard)
+                        </option>
+
+                        <option value="5" selected>
+                            Alta (Pressione promo forte)
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Overlap -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-2">
+                        Fattore Cross-Channel Overlap
+                    </label>
+
+                    <select id="overlapRate" class="bg-white text-gray-800" onchange="calculate()">
+
+                        <option value="0.10">
+                            Basso Overlap (10% - Campagna pochi mezzi)
+                        </option>
+
+                        <option value="0.25">
+                            Medio Overlap (25% - Campagna mix standard)
+                        </option>
+
+                        <option value="0.35" selected>
+                            Alto Overlap (35% - Campagna Broad)
+                        </option>
+
+                    </select>
+                </div>
+            </div>
+
+            <!-- NUOVI PARAMETRI -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 pt-6 border-t border-gray-100 mb-6">
+
+                <!-- Incentivi -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-2">
+                        Incentivi Statali
+                    </label>
+
+                    <select id="incentives" onchange="calculate()">
+
+                        <option value="1.0" selected>
+                            Nessuno Incentivo Statale
+                        </option>
+
+                        <option value="1.25">
+                            Incentivi Statali Attivi
+                        </option>
+
+                       
+                    </select>
+                </div>
+
+                <!-- Motorizzazione -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-2">
+                        Motorizzazione
+                    </label>
+
+                    <select id="powertrain" onchange="calculate()">
+
+                        <option value="1.0" selected>
+                            Termico/Ibrido
+                        </option>
+
+                        <option value="0.75">
+                            Elettrico 100% - BEV
+                        </option>
+
+                    </select>
+                </div>
+
+                <!-- Dealer -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-2">
+                        Rete Concessionari
+                    </label>
+
+                    <select id="dealerNetwork" onchange="calculate()">
+
+                        <option value="1.15">
+                            Rete Capillare (>100 dealer)
+                        </option>
+
+                        <option value="1.0" selected>
+                            Rete Media (50-100 dealer)
+                        </option>
+
+                        <option value="0.7">
+                            Rete Nuova/Limitata (&lt;50 dealer)
+                        </option>
+
+                    </select>
+                </div>
+
+                <!-- Delivery -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-500 mb-2">
+                        Tempi di Consegna
+                    </label>
+
+                    <select id="deliveryTime" onchange="calculate()">
+
+                        <option value="1.2">
+                            Pronta Consegna
+                        </option>
+
+                        <option value="1.0" selected>
+                            Standard (2-4 mesi)
+                        </option>
+
+                        <option value="0.7">
+                            Lunghi Tempi d'Attesa (>6 mesi)
+                        </option>
+
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- IN MARKET -->
+            <div class="pt-4 border-t border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <div class="bg-amber-50 p-4 rounded-lg border border-amber-200">
+
+                    <label class="block text-xs font-bold uppercase text-amber-800 mb-2">
+                        In-Market: Canali Mass Market (Push)
+                    </label>
+
+                    <select
+                        id="inMarketMassRate"
+                        class="border-amber-300 text-amber-900 bg-white"
+                        onchange="calculate()"
+                    >
+                        <option value="0.05">5% (Livello basso)</option>
+                        <option value="0.12" selected>12% (Livello medio)</option>
+                        <option value="0.20">20% (Livello alto)</option>
+                    </select>
+
+                    <p class="text-[10px] text-amber-700 mt-1">
+                        Quota applicata alla reach di TV, CTV, Radio,
+                        Social, Outdoor, Video e Display.
+                    </p>
+                </div>
+
+                <div class="bg-emerald-50 p-4 rounded-lg border border-emerald-200">
+
+                    <label class="block text-xs font-bold uppercase text-emerald-800 mb-2">
+                        In-Market: Canali Search (Pull)
+                    </label>
+
+                    <select
+                        id="inMarketSearchRate"
+                        class="border-emerald-300 text-emerald-900 bg-white"
+                        onchange="calculate()"
+                    >
+                        <option value="0.05">5% (Intercettazione minima)</option>
+                        <option value="0.12">12% (Filtro standard)</option>
+                        <option value="0.20" selected>20% (Intercettazione forte)</option>
+                    </select>
+
+                    <p class="text-[10px] text-emerald-700 mt-1">
+                        Quota applicata alla reach di Search Brand e Search Generic.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TABELLA -->
+        <div class="card overflow-hidden p-0 border border-gray-200">
+
+            <div class="p-5 border-b border-gray-100 bg-white">
+                <h3 class="text-lg font-bold text-gray-900">
+                    Canali Media & Contributo Singolo Touchpoint
+                </h3>
+            </div>
+
+            <div class="overflow-x-auto">
+
+                <table class="w-full text-left border-collapse">
+
+                    <thead>
+                        <tr class="border-b border-gray-200 bg-gray-50 text-gray-600 uppercase text-xs tracking-wider">
+                            <th class="p-4 font-bold">Touchpoint</th>
+                            <th class="p-4 font-bold w-24">Copertura %</th>
+                            <th class="p-4 font-bold">Reach (Assoluta)</th>
+                            <th class="p-4 font-bold w-28">CVR Base (%)</th>
+                            <th class="p-4 font-bold">CVR Corretto (%)</th>
+                            <th class="p-4 font-bold text-right">Leads Generati</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="channelsBody"></tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        const channels = [
+            { name: "Search Brand", coverage: 0, cvr: 12.0, isInMarketFiltered: false },
+            { name: "Search Generic", coverage: 14, cvr: 4.5, isInMarketFiltered: false },
+            { name: "Social", coverage: 0, cvr: 5.5, isInMarketFiltered: true },
+            { name: "YouTube", coverage: 8, cvr: 1, isInMarketFiltered: true },
+            { name: "Connected TV", coverage: 5, cvr: 1.5, isInMarketFiltered: true },
+            { name: "Display / Programmatic", coverage: 0, cvr: 0.3, isInMarketFiltered: true },
+            { name: "Televisione (Lineare)", coverage: 58, cvr: 0.15, isInMarketFiltered: true },
+            { name: "Radio", coverage: 0, cvr: 0.12, isInMarketFiltered: true },
+            { name: "Outdoor", coverage: 1, cvr: 0.05, isInMarketFiltered: true },
+            { name: "Cinema", coverage: 0, cvr: 0.02, isInMarketFiltered: true }
+        ];
+
+        function init() {
+
+            const tbody = document.getElementById('channelsBody');
+
+            channels.forEach((ch, index) => {
+
+                const row = document.createElement('tr');
+
+                row.className =
+                    "border-b border-gray-100 hover:bg-gray-50/80 transition-colors";
+
+                row.innerHTML = `
+                    <td class="p-4 font-semibold text-gray-900">${ch.name}</td>
+
+                    <td class="p-4">
+                        <input
+                            type="number"
+                            step="0.1"
+                            value="${ch.coverage}"
+                            class="cov-input text-center font-medium"
+                            data-index="${index}"
+                            oninput="calculate()"
+                        >
+                    </td>
+
+                    <td class="p-4 text-gray-500 font-mono">
+                        <span class="reach-val">0</span>
+                    </td>
+
+                    <td class="p-4">
+                        <input
+                            type="number"
+                            step="0.01"
+                            value="${ch.cvr}"
+                            class="cvr-input text-center text-gray-600"
+                            data-index="${index}"
+                            oninput="calculate()"
+                        >
+                    </td>
+
+                    <td class="p-4 font-mono font-medium text-emerald-600">
+                        <span class="cvr-adjusted-val">0%</span>
+                    </td>
+
+                    <td class="p-4 text-right font-bold text-slate-900 font-mono">
+                        <span class="lead-val">0</span>
+                    </td>
+                `;
+
+                tbody.appendChild(row);
+            });
+
+            calculate();
+        }
+
+        function getStrategicMultiplier() {
+
+            let multiplier = 1.0;
+
+            // Tipo lancio
+            if (document.getElementById('launchType').value === 'restyling') {
+                multiplier *= 1.25;
+            }
+
+            if (document.getElementById('launchType').value === 'new') {
+                multiplier *= 0.85;
+            }
+
+            // Familiarità Brand
+            const brandStatus =
+                document.getElementById('brandStatus').value;
+
+            if (brandStatus === 'existing') {
+                multiplier *= 0.85;
+            }
+
+            if (brandStatus === 'new_brand') {
+                multiplier *= 0.70;
+            }
+
+            // Competitor pressure
+            const compLevel =
+                parseInt(document.getElementById('compLevel').value);
+
+            if (compLevel > 3) {
+                multiplier *= 0.86;
+            }
+
+            if (compLevel < 3) {
+                multiplier *= 1.10;
+            }
+
+            // Incentivi
+            multiplier *= parseFloat(
+                document.getElementById('incentives').value
+            );
+
+            // Motorizzazione
+            multiplier *= parseFloat(
+                document.getElementById('powertrain').value
+            );
+
+            // Dealer network
+            multiplier *= parseFloat(
+                document.getElementById('dealerNetwork').value
+            );
+
+            // Delivery
+            multiplier *= parseFloat(
+                document.getElementById('deliveryTime').value
+            );
+
+            return multiplier;
+        }
+
+        function calculate() {
+
+            const totalTarget =
+                parseInt(document.getElementById('totalTarget').value) || 0;
+
+            const covInputs =
+                document.querySelectorAll('.cov-input');
+
+            const cvrInputs =
+                document.querySelectorAll('.cvr-input');
+
+            const reachSpans =
+                document.querySelectorAll('.reach-val');
+
+            const cvrAdjustedSpans =
+                document.querySelectorAll('.cvr-adjusted-val');
+
+            const leadSpans =
+                document.querySelectorAll('.lead-val');
+
+            let grossLeadsCount = 0;
+
+            const strategicMultiplier =
+                getStrategicMultiplier();
+
+            // In-market
+            const massRate =
+                parseFloat(document.getElementById('inMarketMassRate').value);
+
+            const searchRate =
+                parseFloat(document.getElementById('inMarketSearchRate').value);
+
+            covInputs.forEach((input, i) => {
+
+                const cov =
+                    parseFloat(input.value) / 100 || 0;
+
+                const cvrBase =
+                    parseFloat(cvrInputs[i].value) || 0;
+
+                const cvrAdjusted =
+                    cvrBase * strategicMultiplier;
+
+                const cvrAdjustedPercent =
+                    cvrAdjusted / 100;
+
+                const reach =
+                    totalTarget * cov;
+
+                let leads = 0;
+
+                if (channels[i].isInMarketFiltered) {
+
+                    leads =
+                        (reach * massRate) * cvrAdjustedPercent;
+
+                } else {
+
+                    leads =
+                        (reach * searchRate) * cvrAdjustedPercent;
+                }
+
+                reachSpans[i].innerText =
+                    Math.round(reach).toLocaleString('it-IT');
+
+                cvrAdjustedSpans[i].innerText =
+                    cvrAdjusted.toFixed(3) + "%";
+
+                leadSpans[i].innerText =
+                    Math.round(leads).toLocaleString('it-IT');
+
+                grossLeadsCount += leads;
+            });
+
+            // Overlap
+            const overlapRate =
+                parseFloat(document.getElementById('overlapRate').value);
+
+            const netLeadsCount =
+                grossLeadsCount * (1 - overlapRate);
+
+            const blendedCVR =
+                totalTarget > 0
+                    ? (netLeadsCount / totalTarget) * 100
+                    : 0;
+
+            // Output KPI
+            document.getElementById('grossLeads').innerText =
+                Math.round(grossLeadsCount).toLocaleString('it-IT');
+
+            document.getElementById('totalLeads').innerText =
+                Math.round(netLeadsCount).toLocaleString('it-IT');
+
+            document.getElementById('blendedCVR').innerText =
+                blendedCVR.toFixed(2) + "%";
+        }
+
+        window.onload = init;
+
+    </script>
+
+</body>
+</html>
